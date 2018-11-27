@@ -1,7 +1,5 @@
-OpenEIT Dashboard
+# OpenEIT Dashboard
 -----------------
-
-## Do the Java Script stuff: 
 
 ## Run the npm installation: 
 ```
@@ -9,13 +7,16 @@ npm install
 npm run build
 ```
 
-# On Linux / OS X
-# clean caches, very important!!!!!
+## On Linux / OS X
+clean caches, very important!!!!!
+
 ```
 rm -rf ~/.node-gyp
 rm -rf ~/.electron-gyp
 rm -rf ./node_modules
 ```
+
+Then to see if the electron app can run type the following from the root directory. The electron app should start. 
 
 ```
 ./node_modules/.bin/electron .
@@ -31,6 +32,7 @@ source activate
 ```
 
 Install the right things in the virtual environment: 
+
 ```
 python setup.py install
 
@@ -45,7 +47,7 @@ import sys
 sys.setrecursionlimit(5000)
 ```
 
-then re-run:
+then re-run the pyinstaller to get a single package:
 
 ```
 
@@ -56,15 +58,16 @@ Now clean up the folders you don't need:
 
 ```
 rm -rf build/
-rm -rf api.spec
+rm -rf app.spec
 
 ```
-
+# Final packaging it all together: 
 then package the whole thing by running: 
 
 ```
 electron-packager . --icon=icons/macos.icns --platform=darwin --arch=x64 --overwrite --prune=true
 ```
+
 Now there should be a package contained in "OpenEIT-darwin-x64" which can be distributed and moved from machine to machine. 
 
 
