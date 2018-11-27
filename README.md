@@ -5,7 +5,7 @@
 
 ```
 npm install
-npm run build
+
 ```
 
 On Linux / OS X clean caches, very important!!!!!
@@ -16,7 +16,16 @@ rm -rf ~/.electron-gyp
 rm -rf ./node_modules
 ```
 
-Then to see if the electron app can run type the following from the root directory. The electron app should start. 
+```
+# On Window PowerShell (not cmd.exe!!!)
+# clean caches, very important!!!!!
+Remove-Item "$($env:USERPROFILE)\.node-gyp" -Force -Recurse -ErrorAction Ignore
+Remove-Item "$($env:USERPROFILE)\.electron-gyp" -Force -Recurse -ErrorAction Ignore
+Remove-Item .\node_modules -Force -Recurse -ErrorAction Ignore
+```
+
+Then to see if the electron app can run type the following from the root directory. The electron app should start. In this case it would be running from the unpackaged python, and is not yet packaged. 
+
 
 ```
 ./node_modules/.bin/electron .
@@ -34,14 +43,18 @@ source activate
 Install the right things in the virtual environment: 
 
 ```
-python setup.py install
-
 pip install -r "eit_dash/requirements.txt"
 
+```
+Now, run the pyinstaller to make a self-contained python package. 
+
+```
 pyinstaller eit_dash/app.py --distpath pydistribution --debug --log-level TRACE
 
 ```
-Add this to the top of app.spec if you get a recurstion depth error: 
+
+Add this to the top of app.spec if you get a recurstion depth error then try pyinstaller again:
+
 ```
 import sys
 sys.setrecursionlimit(5000)
@@ -62,16 +75,17 @@ rm -rf app.spec
 
 ```
 
-There should be a folder called pydistribution which contains the final packaged python app! If not, there is an error. 
+
+There should be a folder called pydistribution which contains the final packaged python app! If not, there is an error which needs to be fixed before continuing. 
 
 # Final packaging it all together: 
-then package the whole thing by running: 
+Now package the front end and backend together by running: 
 
 ```
 electron-packager . --icon=icons/macos.icns --platform=darwin --arch=x64 --overwrite --prune=true
 ```
 
-Now there should be a package contained in "OpenEIT-darwin-x64" which can be distributed and moved from machine to machine. 
+There should be a package contained in "OpenEIT-darwin-x64" which can be distributed and moved from machine to machine. 
 
 
 ## ----
