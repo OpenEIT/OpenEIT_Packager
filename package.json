@@ -15,5 +15,8 @@
   "devDependencies": {
     "electron": "^3.0.10",
     "electron-builder": "20.15.1"
+  },
+  "dependencies": {
+    "electron-reload": "^1.3.0"
   }
 }

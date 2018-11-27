@@ -1,29 +1,20 @@
-// const electron = require('electron');
-// const {session} = require('electron');
-
-// // Module to control application life.
-// const app = electron.app
-// // Module to create native browser window.
-// const BrowserWindow = electron.BrowserWindow
-
 // const path = require('path')
 // const url = require('url')
-
-
 const electron = require('electron')
 const app = electron.app
 const BrowserWindow = electron.BrowserWindow
 const path = require('path')
 
-
 /*************************************************************
  * py process
  *************************************************************/
-
 const PY_DIST_FOLDER = 'pydistribution'
 const PY_FOLDER = 'eit_dash'
 const PY_MODULE = 'app' // without .py suffix
 const PO_PI = 'bin'
+var substring   = "openeit_server_started";
+var loaded = false;
+// Python Dash/Plotly Server will be running on http://127.0.0.1:8050/
 
 let pyProc = null
 
@@ -33,24 +24,12 @@ const guessPackaged = () => {
 }
 
 const getScriptPath = () => {
-  // if (!guessPackaged()) {
-  //   return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
-  // }
-  // if (process.platform === 'win32') {
-  //   return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + '.exe')
-  // }
-  // return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE)
   return path.join(__dirname, PY_FOLDER, PY_MODULE+'.py')
 }
 
 const getPoPyPath = () => {
-
-  // if (process.platform === 'win32') {
-  //   return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + '.exe')
-  // }
   return path.join(__dirname, PY_DIST_FOLDER, PO_PI+'/python')
 }
-
 // 
 // main window has to wait until create main window. 
 // when it is execute rest of code. 
@@ -72,10 +51,48 @@ const createPyProc = () => {
   //pyProc = require('child_process').spawn('/Users/jeanrintoul/Desktop/mindseyebiomedical/EIT/EIT_Altium/EIT_32/python/popy/osx/popy3.7m/bin/python', ['/Users/jeanrintoul/Desktop/mindseyebiomedical/EIT/EIT_Altium/EIT_32/python/OpenEIT_Dashboard/eit_dash/app.py'])
   pyProc = require('child_process').spawn(popy, [script])
 
- 
+  // create a listener on the spawned child process, and pump this to the console. 
+  pyProc.stderr.on('data', function(data) {
+      console.log('stderr: ' + data);
+
+      // find the marker that says the server has loaded then, and only then load the main window. 
+      if (data.includes(substring)) {
+        //console.log('we found it!')
+        loaded = true 
+        const url = 'http://127.0.0.1:8050/';
+        mainWindow.loadURL(url);
+
+        mainWindow.once('ready-to-show', () => {
+          mainWindow.show()
+          if (loaded) {
+            console.log('finished loading python server')
+            mainWindow.show()
+          }
+          else {
+            console.log('not finished loading python server')
+          }
+
+        })
+
+      }
+  });
+
+  pyProc.stdout.on('data', function(data) {
+      console.log('stdout: ' + data);
+  });
+
+  pyProc.on('close', function(code) {
+      console.log('closing code: ' + code);
+  });
+
   if (pyProc != null) {
     //console.log(pyProc)
     console.log('child process success')
+  }
+  else {
+      // trying again. 
+      console.log('child process failed. Trying again... ')
+      pyProc = require('child_process').spawn(popy, [script])
   }
 }
 
@@ -96,10 +113,20 @@ function createWindow () {
   //const ses = session.fromPartition('persist:name');
 
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600, minWidth: 600, minHeight: 150,
-    //titleBarStyle: 'hidden', // OSX only
+  mainWindow = new BrowserWindow({show: false, width: 1100, height: 700, minWidth: 600, minHeight: 150,
     //frame: false // all platforms
   })
+
+
+  // const url = 'http://127.0.0.1:8050/';
+  // mainWindow.loadURL(url);
+  // mainWindow.on('ready-to-show', () => {
+  //   mainWindow.show()
+  // })
+
+  // Failed attempt at clearing the cache
+  // const options = {"extraHeaders" : "pragma: no-cache\n"};
+  // ses.clearCache(()=> mainWindow.loadURL(url, options));
 
   // and load the index.html of the app.
   /*
@@ -109,17 +136,6 @@ function createWindow () {
     slashes: true
   });
   */
-
-  // spawn a child process calling python app.py
-
-  const url = 'http://127.0.0.1:8050/';
-
-  // Failed attempt at clearing the cache
-  // const options = {"extraHeaders" : "pragma: no-cache\n"};
-  // ses.clearCache(()=> mainWindow.loadURL(url, options));
-
-  mainWindow.loadURL(url);
-
   // Open the DevTools.
   //mainWindow.webContents.openDevTools()
 
@@ -137,13 +153,18 @@ function createWindow () {
 // Some APIs can only be used after this event occurs.
 app.on('ready', createWindow)
 
+// require('electron-reload')(__dirname);
+
 // Quit when all windows are closed.
 app.on('window-all-closed', function () {
+  pyProc.kill()
+  pyProc = null
+  app.quit()
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
-  if (process.platform !== 'darwin') {
-    app.quit()
-  }
+  // if (process.platform !== 'darwin') {
+  //   app.quit()
+  // }
 })
 
 app.on('activate', function () {
