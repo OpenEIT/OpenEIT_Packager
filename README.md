@@ -2,13 +2,13 @@
 -----------------
 
 ## Run the npm installation: 
+
 ```
 npm install
 npm run build
 ```
 
-## On Linux / OS X
-clean caches, very important!!!!!
+On Linux / OS X clean caches, very important!!!!!
 
 ```
 rm -rf ~/.node-gyp
