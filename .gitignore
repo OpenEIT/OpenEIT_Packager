@@ -1,5 +1,6 @@
 build/
 dist/
+pydistribution/
 node_modules/
 OpenEIT-darwin-x64/
 pydistribution/

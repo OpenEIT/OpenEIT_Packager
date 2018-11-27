@@ -23,6 +23,7 @@ const path = require('path')
 const PY_DIST_FOLDER = 'pydistribution'
 const PY_FOLDER = 'eit_dash'
 const PY_MODULE = 'app' // without .py suffix
+const PO_PI = 'bin'
 
 let pyProc = null
 
@@ -32,24 +33,45 @@ const guessPackaged = () => {
 }
 
 const getScriptPath = () => {
-  if (!guessPackaged()) {
-    return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
-  }
-  if (process.platform === 'win32') {
-    return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + '.exe')
-  }
-  return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE)
+  // if (!guessPackaged()) {
+  //   return path.join(__dirname, PY_FOLDER, PY_MODULE + '.py')
+  // }
+  // if (process.platform === 'win32') {
+  //   return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + '.exe')
+  // }
+  // return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE)
+  return path.join(__dirname, PY_FOLDER, PY_MODULE+'.py')
 }
 
-const createPyProc = () => {
-  let script = getScriptPath()
-  //let port = '' + selectPort()
+const getPoPyPath = () => {
 
-  if (guessPackaged()) {
-    pyProc = require('child_process').execFile(script)
-  } else {
-    pyProc = require('child_process').spawn('python', [script])
-  }
+  // if (process.platform === 'win32') {
+  //   return path.join(__dirname, PY_DIST_FOLDER, PY_MODULE, PY_MODULE + '.exe')
+  // }
+  return path.join(__dirname, PY_DIST_FOLDER, PO_PI+'/python')
+}
+
+// 
+// main window has to wait until create main window. 
+// when it is execute rest of code. 
+// 
+const createPyProc = () => {
+  let script  = getScriptPath()
+  let popy    = getPoPyPath()
+
+  //console.log(popy)
+  //console.log(script)
+  // 
+  //let port = '' + selectPort()
+  // if (guessPackaged()) {
+  //   pyProc = require('child_process').execFile(script)
+  // } else {
+  //   pyProc = require('child_process').spawn('python', [script])
+  // }
+  // the below is correct
+  //pyProc = require('child_process').spawn('/Users/jeanrintoul/Desktop/mindseyebiomedical/EIT/EIT_Altium/EIT_32/python/popy/osx/popy3.7m/bin/python', ['/Users/jeanrintoul/Desktop/mindseyebiomedical/EIT/EIT_Altium/EIT_32/python/OpenEIT_Dashboard/eit_dash/app.py'])
+  pyProc = require('child_process').spawn(popy, [script])
+
  
   if (pyProc != null) {
     //console.log(pyProc)
@@ -87,6 +109,8 @@ function createWindow () {
     slashes: true
   });
   */
+
+  // spawn a child process calling python app.py
 
   const url = 'http://127.0.0.1:8050/';
 
