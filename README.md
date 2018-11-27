@@ -61,6 +61,9 @@ rm -rf build/
 rm -rf app.spec
 
 ```
+
+There should be a folder called pydistribution which contains the final packaged python app! If not, there is an error. 
+
 # Final packaging it all together: 
 then package the whole thing by running: 
 
