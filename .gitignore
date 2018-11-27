@@ -1,0 +1,9 @@
+build/
+dist/
+node_modules/
+OpenEIT-darwin-x64/
+pydistribution/
+eit_dash/__pycache__/
+eit_dash/OpenEIT/reconstruction/pyeit/mesh/__pycache__/
+.DS_Store
+.DS_Store?

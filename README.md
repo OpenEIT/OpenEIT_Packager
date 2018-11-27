@@ -1,6 +1,75 @@
 OpenEIT Dashboard
 -----------------
 
+## Do the Java Script stuff: 
+
+## Run the npm installation: 
+```
+npm install
+npm run build
+```
+
+# On Linux / OS X
+# clean caches, very important!!!!!
+```
+rm -rf ~/.node-gyp
+rm -rf ~/.electron-gyp
+rm -rf ./node_modules
+```
+
+```
+./node_modules/.bin/electron .
+```
+
+## Package the python app: 
+
+Create a  virtual environment then cd into the bin directory and activate it. 
+i.e. 
+```
+python -m venv virty
+source activate
+```
+
+Install the right things in the virtual environment: 
+```
+python setup.py install
+
+pip install -r "eit_dash/requirements.txt"
+
+pyinstaller eit_dash/app.py --distpath pydistribution --debug --log-level TRACE
+
+```
+Add this to the top of app.spec if you get a recurstion depth error: 
+```
+import sys
+sys.setrecursionlimit(5000)
+```
+
+then re-run:
+
+```
+
+pyinstaller app.spec --onefile --distpath pydistribution --debug --log-level TRACE
+```
+
+Now clean up the folders you don't need: 
+
+```
+rm -rf build/
+rm -rf api.spec
+
+```
+
+then package the whole thing by running: 
+
+```
+electron-packager . --icon=icons/macos.icns --platform=darwin --arch=x64 --overwrite --prune=true
+```
+Now there should be a package contained in "OpenEIT-darwin-x64" which can be distributed and moved from machine to machine. 
+
+
+## ----
+
 Visualization dashboard for OpenEIT.
 
 ## Requirements
