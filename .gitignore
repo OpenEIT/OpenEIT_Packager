@@ -4,6 +4,7 @@ pydistribution/
 node_modules/
 OpenEIT-darwin-x64/
 pydistribution/
+dmgassets/
 eit_dash/__pycache__/
 eit_dash/OpenEIT/reconstruction/pyeit/mesh/__pycache__/
 .DS_Store

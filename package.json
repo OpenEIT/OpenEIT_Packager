@@ -10,13 +10,14 @@
   "build": {
     "appId": "com.mindseyebiomedical",
     "productName": "OpenEIT",
-    "icon": "icons/macos.icns"
+    "icon": "icons/logo.icns"
   },
   "devDependencies": {
     "electron": "^3.0.10",
-    "electron-builder": "20.15.1"
+    "electron-builder": "^20.36.2"
   },
   "dependencies": {
+    "dist": "^0.1.2",
     "electron-reload": "^1.3.0"
   }
 }

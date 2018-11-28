@@ -1,5 +1,10 @@
-# OpenEIT Dashboard
------------------
+# OpenEIT Dashboard as a Portable Application
+------------------------------------------
+
+The openeit dashboard can be run through the OpenEIT repository by installing the python dependencies, but this requires some effort. To make it easy to get started, this portable python application is a desktop app with a simple DMG installer. This means users can simply double click to install a fully working time series/spectroscopy and EIT reconstruction tool kit. 
+
+Right now, we have a DMG for OSX. If this becomes more popular and there are requests, we may consider doing it for other operating systems. 
+
 
 ## Run the npm installation: 
 
@@ -46,51 +51,44 @@ Install the right things in the virtual environment:
 pip install -r "eit_dash/requirements.txt"
 
 ```
-Now, run the pyinstaller to make a self-contained python package. 
 
-```
-pyinstaller eit_dash/app.py --distpath pydistribution --debug --log-level TRACE
-
-```
-
-Add this to the top of app.spec if you get a recurstion depth error then try pyinstaller again:
-
-```
-import sys
-sys.setrecursionlimit(5000)
-```
-
-then re-run the pyinstaller to get a single package:
-
-```
-
-pyinstaller app.spec --onefile --distpath pydistribution --debug --log-level TRACE
-```
-
-Now clean up the folders you don't need: 
-
-```
-rm -rf build/
-rm -rf app.spec
-
-```
-
-
-There should be a folder called pydistribution which contains the final packaged python app! If not, there is an error which needs to be fixed before continuing. 
+There should be a folder called pydistribution which contains the final packaged python app. This is a portable version of python with all module dependencies installed. It's large! 
 
 # Final packaging it all together: 
-Now package the front end and backend together by running: 
+Now package it into an app by running: 
 
 ```
-electron-packager . --icon=icons/macos.icns --platform=darwin --arch=x64 --overwrite --prune=true
+electron-packager . --icon=icons/logo.icns --platform=darwin --arch=x64 --overwrite --prune=true
+
 ```
 
 There should be a package contained in "OpenEIT-darwin-x64" which can be distributed and moved from machine to machine. 
 
+For extra points, create the installer. First you need to install it: 
 
-## ----
+This article is helpful: https://www.electron.build/cli
+https://www.npmjs.com/package/electron-builder
 
-Visualization dashboard for OpenEIT.
+```
+
+sudo npm config set unsafe-perm=true
+
+./node_modules/.bin/electron-builder --x64 --prepackaged OpenEIT-darwin-x64 dist
+```
+or: 
+
+```
+./node_modules/.bin/build --prepackaged --projectDir  dist
+DEBUG=electron-builder
+
+./node_modules/.bin/electron-builder --x64 --prepackaged 
+
+```
+
+Now there should be a dmg contained in the dist folder, that can be installed on any machine. 
+
+
+# Note on editing Visualization dashboard for OpenEIT: 
 
 ## Requirements
 ```
@@ -139,4 +137,3 @@ modes = [
 ```
 * That's it! Run the app and your new mode viz should appear in the dashboard, under its own navigation tab.
 
-> Note: If you new mode requires some special settings for the board, we recommend that you add this logic in the `state.State` class, inside the `set_mode()` method.
