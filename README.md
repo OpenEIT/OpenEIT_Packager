@@ -1,5 +1,4 @@
 # OpenEIT Dashboard as a Portable Application
-------------------------------------------
 
 The openeit dashboard can be run through the OpenEIT repository by installing the python dependencies, but this requires some effort. To make it easy to get started, this portable python application is a desktop app with a simple DMG installer. This means users can simply double click to install a fully working time series/spectroscopy and EIT reconstruction tool kit. 
 
@@ -136,4 +135,11 @@ modes = [
 ]
 ```
 * That's it! Run the app and your new mode viz should appear in the dashboard, under its own navigation tab.
+
+## Contributors
+
+* Jean Rintoul
+* Marion Le Borgne 
+
+
 
