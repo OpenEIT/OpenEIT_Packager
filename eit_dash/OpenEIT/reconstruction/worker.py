@@ -26,20 +26,34 @@ class ReconstructionWorker(threading.Thread):
     puts the reconstructed image to `output_queue`.
     """
 
-    def __init__(self, input_queue, output_queue,algorithm,n_el):
+    def __init__(self):
         super().__init__(daemon=True)
+
+        self._input_queue = None
+        self._output_queue = None
+        self._reconstruction = None
+        self._running = True
+        self._algorithm = None
+
+    def reset(self,input_queue, output_queue,algorithm,n_el):
+        self._input_queue   = None
+        self._output_queue  = None
+        #self._reconstruction = None
+
         self._input_queue   = input_queue
         self._output_queue  = output_queue
         self._running       = True
         self._algorithm     = algorithm
-
         self._baseline      = 1 
+
         if self._algorithm == 'bp':
             self._reconstruction = BpReconstruction(n_el)
         elif self._algorithm  == 'greit':
             self._reconstruction = GreitReconstruction(n_el)
-        elif self._algorithm  == 'jac':
+        elif 'jac' in self._algorithm:
+            # resetting for new number of electrodes. 
             self._reconstruction = JacReconstruction(n_el)
+            self._reconstruction.reset(n_el)
 
     def baseline(self):
         self._baseline = 1
@@ -62,28 +76,32 @@ class ReconstructionWorker(threading.Thread):
     def get_radon_params(self):
         return 0
 
-    def stop(self):
+    def stop_reconstructing(self):
         self._running = False
+
+    def start_reconstructing(self):
+        self._running = True
 
     def run(self):
         # TODO: add time tracking here!
         while self._running:
-            data = np.array(self._input_queue.get())
-            # preprocess the data to exclude zero values? 
-            data = [1.0 if x == 0 else x for x in data]
+            if self._input_queue is not None:             
+                data = np.array(self._input_queue.get())
+                # preprocess the data to exclude zero values? 
+                data = [1.0 if x == 0 else x for x in data]
 
-            print (len(data))
-            
-            if self._baseline == 1: 
-                self._reconstruction.update_reference(data)
-                self._baseline = 0
+                print (len(data))
 
-            try:
-                before = time.time()
-                img = self._reconstruction.eit_reconstruction(data)
-                logger.info("reconstruction time: %.2f", time.time() - before)
-            except RuntimeError as err:
-                logger.info('reconstruction error: %s', err)
-            else:
-                self._output_queue.put(img)
+                if self._baseline == 1: 
+                    self._reconstruction.update_reference(data)
+                    self._baseline = 0
+
+                try:
+                    before = time.time()
+                    img = self._reconstruction.eit_reconstruction(data)
+                    logger.info("reconstruction time: %.2f", time.time() - before)
+                except RuntimeError as err:
+                    logger.info('reconstruction error: %s', err)
+                else:
+                    self._output_queue.put(img)
 
